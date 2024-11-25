@@ -23,7 +23,9 @@ impl TlsAcceptor {
         client_ca_root: Option<Certificate>,
         client_auth_optional: bool,
     ) -> Result<Self, crate::BoxError> {
-        let builder = ServerConfig::builder();
+        let provider = Arc::new(tokio_rustls::rustls::crypto::ring::default_provider());
+        let builder =
+            ServerConfig::builder_with_provider(provider).with_safe_default_protocol_versions()?;
 
         let builder = match client_ca_root {
             None => builder.with_no_client_auth(),
